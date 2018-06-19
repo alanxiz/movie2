@@ -42,9 +42,6 @@ ratings %>%
     ucase = n()
   )
 
-  
-
-
 # number of movies with ratings > 3.5
 
 ratings %>%
@@ -55,6 +52,65 @@ ratings %>%
     min = min(rating),
     max = max(rating),
     m3.5 = n_distinct(movieId))
+
+## select a random sample of movies
+
+id = ratings %>%
+        distinct(movieId)
+
+# randomly select 100 movies
+
+idx <- sample_n(id, 100)
+
+# merge randomly selected movies to ratings data to get their ratings
+
+ratings2 <- inner_join(idx, ratings, by ="movieId")
+
+# by movies, avg rating and number of reviews
+
+s1<- ratings2 %>%
+      group_by(movieId) %>%
+      summarise(
+        avg = mean(rating),
+        nsize = n())
+
+# rank grouped data by review count descending
+
+s1<- as.data.frame(s1)
+
+s1<- s1 %>%
+       arrange(desc(nsize))
+
+# check the genre and title of the top two reviewed movies
+
+movies %>%
+  filter(movieId %in% c(2324, 594))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
