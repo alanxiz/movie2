@@ -27,10 +27,11 @@ head(ratings)
 
 library(dplyr)
 
-# unique values of ratings
+# unique values of ratings ordered from low to high
 
 ratings %>%
   distinct(rating) %>%
+  arrange(rating)
 
 # unique values of ratings and the number of movies or records
 # same movie could be rated by different users with the same rating
@@ -115,6 +116,49 @@ cor(s2$nsize, s2$year)  # -0.09
 
 model <- lm(nsize ~ year, data = s2)
 summary(model)  # year is not significant 
+
+################### check the distribution of ratings by year of movie
+
+# number of movies in movie data
+
+movies %>%
+  summarise(movie_count = n_distinct(movieId))  # 27,278
+
+# get the year of movies
+
+movies <- movies %>%
+             mutate(year = str_sub(title, -5, -2))
+
+# randomly select 10,000 movies id
+
+id2<- movies %>%
+  distinct(movieId, year)
+
+id2<- sample_n(id2, 10000)
+
+# merge with rating data
+
+ratings3<- inner_join(id2, ratings, by = "movieId")
+
+# ratings distribution
+
+a<- ratings3 %>%
+  group_by(rating) %>%
+  summarise(size = n())
+
+a<- as.data.frame(a)
+
+# plot the ratings distribution
+
+library(ggplot2)
+
+p<- ggplot(data=ratings3, aes(x=rating)) + 
+  geom_histogram(bins=10, color="darkblue", fill="lightblue") +
+  scale_x_continuous(breaks= seq(0.5, 5, by = 0.5)) +
+  labs(title = "Movie Ratings Distribution")
+
+p
+
 
 
 
